@@ -24,6 +24,7 @@ public class TankDrive extends LinearOpMode {
         // One of the pairs of motors needs to be reversed
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection(DcMotor.Direction.REVERSE)
 
         // Wait for the drive to press the Start button on the Driver Hub
         waitForStart();
@@ -41,6 +42,6 @@ public class TankDrive extends LinearOpMode {
             rightFront.setPower(right);
             leftBack.setPower(left);
             rightBack.setPower(right);
-        }
+        
     }
 }
