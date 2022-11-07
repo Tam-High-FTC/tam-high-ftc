@@ -21,8 +21,8 @@ import java.lang.Math;
 @TeleOp(name = "Template: Basic Mecanum Drive", group = "Linear Opmode")
 public class BasicMecanumDrive extends LinearOpMode {
     // Declare the hardware variables
-    private DcMotorEx leftFront, rightFront;
-    private DcMotorEx leftBack, rightBack;
+    private DcMotorEx leftFrontMotor, rightFrontMotor;
+    private DcMotorEx leftBackMotor, rightBackMotor;
     private BNO055IMU imu;
     private DcMotorEx motorOne, motorTwo, motorThree;
     private Servo clawServoRight, clawServoLeft; // right is 1, left is 2
@@ -32,33 +32,34 @@ public class BasicMecanumDrive extends LinearOpMode {
     public float rotateSpeed = 1f;
     
     public float targetRotation = 0f;
-    public float targetX = 0f;
-    public float targetY = 0f;
+    public float targetXPosition = 0f;
+    public float targetYPosition = 0f;
 
     @Override
     public void runOpMode() {
         // Initialize the hardware variables. Note that the strings used here as
         // parameters
         // to 'get' must correspond to the names assigned during the robot configuration
-        leftFront = hardwareMap.get(DcMotorEx.class, "left_front");
-        rightFront = hardwareMap.get(DcMotorEx.class, "right_front");
-        leftBack = hardwareMap.get(DcMotorEx.class, "left_back");
-        rightBack = hardwareMap.get(DcMotorEx.class, "right_back");
+        leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front");
+        rightFrontMotor = hardwareMap.get(DcMotorEx.class, "right_front");
+        leftBackMotor = hardwareMap.get(DcMotorEx.class, "left_back");
+        rightBackMotor= hardwareMap.get(DcMotorEx.class, "right_back");
         clawServoRight = hardwareMap.get(Servo.class, "servo_one");
         clawServoLeft = hardwareMap.get(Servo.class, "servo_two");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         motorOne = hardwareMap.get(DcMotorEx.class, "lift_one");
         motorTwo = hardwareMap.get(DcMotorEx.class, "lift_two");
         motorThree = hardwareMap.get(DcMotorEx.class, "lift_three");
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu.initialize(parameters);
 
         // One of the pairs of motors needs to be reversed
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
-        // rightBack.setDirection(DcMotor.Direction.REVERSE);
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        // rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
         // START SETUP FOR LIFT SYSTEM
         // Initialize the hardware variables. Note that the strings used here as
         // parameters
@@ -93,7 +94,7 @@ public class BasicMecanumDrive extends LinearOpMode {
         // Wait for the drive to press the Start button on the Driver Hub
         waitForStart();
         
-        // PIDCoefficients pidOrig = leftFront.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        // PIDCoefficients pidOrig = leftFrontMotor.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Loop until the robot is stopped
         while (opModeIsActive()) {
@@ -118,6 +119,7 @@ public class BasicMecanumDrive extends LinearOpMode {
             // Rotate by moving right stick left-right
             float playerRotation = gamepad1.right_stick_x;
             targetRotation -= playerRotation * rotateSpeed;
+            float resetTargetPosition = gamepad1.button_y
             // First, we need to split the translation vector into a direction and a
             // magnitude.
             // The direction is the direction to move
@@ -132,6 +134,8 @@ public class BasicMecanumDrive extends LinearOpMode {
             float magnitude = (float)Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
             float speed = rotationsPerSecond
                 * BasicMecanumDrive.TICKS_PER_ROTATION;
+
+            
                 
             // Amend rotation to correct for drift
             float currentRotation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
@@ -145,6 +149,7 @@ public class BasicMecanumDrive extends LinearOpMode {
             if (rotationDelta > 180f) rotationDelta -= 360f;
             if (rotationDelta < -180f) rotationDelta += 360f;
             float finalRotationPower = rotationDelta / -3600f;
+            if (resetTargetPosition) currentRotation = 0;
             telemetry.addLine("Rotation");
             telemetry.addData("Current: ", currentRotation);
             telemetry.addData("Target: ", targetRotation);
@@ -155,7 +160,7 @@ public class BasicMecanumDrive extends LinearOpMode {
             // TODO Explain these calculations
             float leftFrontPower = magnitude * (float)Math.sin(direction + Math.PI / 4) + finalRotationPower;
             float leftBackPower = magnitude * (float)Math.sin(direction - Math.PI / 4) + finalRotationPower;
-            float rightFrontPower = magnitude * (float)Math.sin(direction - Math.PI / 4) - finalRotationPower;
+            float rightFrontMotorPower = magnitude * (float)Math.sin(direction - Math.PI / 4) - finalRotationPower;
             float rightBackPower = magnitude * (float)Math.sin(direction + Math.PI / 4) - finalRotationPower;
 
             // All of the values must be scaled to be within [-1,1]
@@ -166,20 +171,20 @@ public class BasicMecanumDrive extends LinearOpMode {
             // Then divide all the powers by that value.
             leftFrontPower = leftFrontPower / maxPower;
             leftBackPower = leftBackPower / maxPower;
-            rightFrontPower = rightFrontPower / maxPower;
+            rightFrontMotorPower = rightFrontMotorPower / maxPower;
             rightBackPower = rightBackPower / maxPower;
             telemetry.addData("maxPower: ", maxPower);
             telemetry.addData("leftFrontPower: ", leftFrontPower);
             telemetry.addData("leftBackPower: ", leftBackPower);
-            telemetry.addData("rightFrontPower: ", rightFrontPower);
+            telemetry.addData("rightFrontMotorPower: ", rightFrontMotorPower);
             telemetry.addData("rightBackPower: ", rightBackPower);
 
 
             // Set the motor power
-            leftFront.setVelocity(speed * leftFrontPower);
-            leftBack.setVelocity(speed * leftBackPower);
-            rightFront.setVelocity(speed * rightFrontPower);
-            rightBack.setVelocity(speed *rightBackPower);
+            leftFrontMotor.setVelocity(speed * leftFrontPower);
+            leftBackMotor.setVelocity(speed * leftBackPower);
+            rightFrontMotor.setVelocity(speed * rightFrontMotorPower);
+            rightBackMotor.setVelocity(speed *rightBackPower);
             
             // START LIFT
             boolean motorUp = gamepad1.dpad_up;
@@ -209,7 +214,7 @@ public class BasicMecanumDrive extends LinearOpMode {
             clawServoLeft.setPosition(1-clawOpen);
             // END CLAW
             
-            telemetry.addData("Encoder", leftFront.getCurrentPosition());
+            telemetry.addData("Encoder", leftFrontMotor.getCurrentPosition());
             telemetry.update();
         }
     }
