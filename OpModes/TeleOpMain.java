@@ -22,81 +22,11 @@ import com.qualcomm.robotcore.hardware.Gyroscope;
 import java.lang.Math;
 
 @TeleOp(name = "Template: Basic Mecanum Drive", group = "Linear Opmode")
-public class BasicMecanumDrive extends LinearOpMode {
-    // Declare the hardware variables
-    private DcMotorEx leftFront, rightFront;
-    private DcMotorEx leftBack, rightBack;
-    private BNO055IMU imu;
-    private DcMotorEx motorOne, motorTwo, motorThree;
-    private Servo clawServoRight, clawServoLeft; // right is 1, left is 2
-    
-    public static float TICKS_PER_ROTATION = 560f;
-    
-    public float rotateSpeed = 1f;
-    
-    public float targetRotation = 0f;
-    public float targetX = 0f;
-    public float targetY = 0f;
-    public float currentDeltaX = 0f;
-    public float currentDeltaY = 0f;
-    public float currentX = 0f;
-    public float currentY = 0f;
+public class TeleOpMain extends BaseOpMode {
 
     @Override
     public void runOpMode() {
-        // Initialize the hardware variables. Note that the strings used here as
-        // parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        leftFront = hardwareMap.get(DcMotorEx.class, "left_front");
-        rightFront = hardwareMap.get(DcMotorEx.class, "right_front");
-        leftBack = hardwareMap.get(DcMotorEx.class, "left_back");
-        rightBack = hardwareMap.get(DcMotorEx.class, "right_back");
-        clawServoRight = hardwareMap.get(Servo.class, "servo_one");
-        clawServoLeft = hardwareMap.get(Servo.class, "servo_two");
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        motorOne = hardwareMap.get(DcMotorEx.class, "lift_one");
-        motorTwo = hardwareMap.get(DcMotorEx.class, "lift_two");
-        motorThree = hardwareMap.get(DcMotorEx.class, "lift_three");
-        
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-
-        imu.initialize(parameters);
-        
-        
-        
-        // One of the pairs of motors needs to be reversed
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
-        // rightBack.setDirection(DcMotor.Direction.REVERSE);
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.REVERSE);
-        // START SETUP FOR LIFT SYSTEM
-        // Initialize the hardware variables. Note that the strings used here as
-        // parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        motorOne.setDirection(DcMotor.Direction.REVERSE);
-        motorThree.setDirection(DcMotor.Direction.REVERSE);
-        motorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorThree.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorOne.setTargetPosition(0);
-        motorTwo.setTargetPosition(0);
-        motorThree.setTargetPosition(0);
-        motorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorTwo.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorThree.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        
-        motorOne.setVelocity(720f, AngleUnit.DEGREES);
-        motorTwo.setVelocity(720f, AngleUnit.DEGREES);
-        motorThree.setVelocity(720f, AngleUnit.DEGREES);
-        
-        motorOne.setPower(1f);
-        motorTwo.setPower(1f);
-        motorThree.setPower(1f);
-        
-        
+        super.runOpMode();
         
         int minPosition = 0;
         int maxPosition = 1550; // 6 turns at 288 ticks per turn
@@ -105,7 +35,6 @@ public class BasicMecanumDrive extends LinearOpMode {
         int liftSpeed = 10;
         double upDownRatio = (maxPositionPull / maxPosition); // Ratio of maxPositionPull to maxPosition
         // END SETUP FOR LIFT SYSTEM
-        
 
         // Wait for the drive to press the Start button on the Driver Hub
         waitForStart();
@@ -140,7 +69,7 @@ public class BasicMecanumDrive extends LinearOpMode {
             
             //Old rotation used as new rotation is bugged
             
-            // float oldRotation = gamepad1.right_stick_x;
+            float oldRotation = gamepad1.right_stick_x;
             
             // Rotate by moving right stick left-right
             
@@ -207,10 +136,10 @@ public class BasicMecanumDrive extends LinearOpMode {
             // END TARGET POSITION CALCS
             
             // TODO Explain these calculations
-            float leftFrontPower = magnitude * (float)Math.sin(direction + Math.PI / 4) + finalRotationPower;
-            float leftBackPower = magnitude * (float)Math.sin(direction - Math.PI / 4) + finalRotationPower;
-            float rightFrontPower = magnitude * (float)Math.sin(direction - Math.PI / 4) - finalRotationPower;
-            float rightBackPower = magnitude * (float)Math.sin(direction + Math.PI / 4) - finalRotationPower;
+            float leftFrontPower = magnitude * (float)Math.sin(direction + Math.PI / 4) + oldRotation;
+            float leftBackPower = magnitude * (float)Math.sin(direction - Math.PI / 4) + oldRotation;
+            float rightFrontPower = magnitude * (float)Math.sin(direction - Math.PI / 4) - oldRotation;
+            float rightBackPower = magnitude * (float)Math.sin(direction + Math.PI / 4) - oldRotation;
 
             // All of the values must be scaled to be within [-1,1]
             // First, find the highest value
@@ -263,7 +192,10 @@ public class BasicMecanumDrive extends LinearOpMode {
             clawServoLeft.setPosition(1-clawOpen);
             // END CLAW
             
-            telemetry.addData("Encoder", leftFront.getCurrentPosition());
+            telemetry.addData("LF", leftFront.getCurrentPosition());
+            telemetry.addData("RF", rightFront.getCurrentPosition());
+            telemetry.addData("LB", leftBack.getCurrentPosition());
+            telemetry.addData("RB", rightBack.getCurrentPosition());
             telemetry.update();
         }
     }
