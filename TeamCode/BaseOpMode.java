@@ -104,6 +104,7 @@ public abstract class BaseOpMode extends LinearOpMode {
                 .setTargetPosition(-(int) Math.floor((double) targetLiftPosition * LIFT_EXTEND_RETRACT_RATIO));
     }
 
+    /** Add lift motor posititions, etc., to telemetry data. */
     public void addLiftTelemetry() {
         telemetry.addData("Lift Position One: ", liftMotorOne.getCurrentPosition());
         telemetry.addData("Lift Position Two: ", liftMotorTwo.getCurrentPosition());
