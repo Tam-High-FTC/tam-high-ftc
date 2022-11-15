@@ -19,7 +19,7 @@ public class TeleOpMain extends BaseOpMode {
     public void runOpMode() {
         super.runOpMode();
 
-        // Wait for the drive to press the Start button on the Driver Hub
+        // Wait for the driver to press the Start button on the Driver Hub
         waitForStart();
         imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
 
