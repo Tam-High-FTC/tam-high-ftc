@@ -169,8 +169,7 @@ public class TeleOpMain extends BaseOpMode {
 
             // START CLAW
             float clawOpen = gamepad1.left_trigger;
-            clawServoRight.setPosition(clawOpen);
-            clawServoLeft.setPosition(1 - clawOpen);
+            moveClaw(clawOpen);
             // END CLAW
 
             telemetry.addData("LF", leftFrontMotor.getCurrentPosition());

@@ -112,6 +112,29 @@ public abstract class BaseOpMode extends LinearOpMode {
         telemetry.addData("Lift Target Position: ", targetLiftPosition);
     }
 
+    /** Move claw to a specific position. 0 is closed, 1 is open. */
+    public void moveClaw(float position) {
+        position = Math.min(0, Math.max(1, position));
+        clawServoRight.setPosition(position);
+        clawServoLeft.setPosition(1 - position);
+    }
+
+    /** Open or close the claw. */
+    public void moveClaw(bool open) {
+        clawServoRight.setPosition(open ? 1 : 0);
+        clawServoLeft.setPosition(open ? 0 : 1);
+    }
+
+    /** Open the claw. */
+    public void openClaw() {
+        moveClaw(true);
+    }
+
+    /** Close the claw. */
+    public void closeClaw() {
+        moveClaw(false);
+    }
+
     @Override
     public void runOpMode() {
         /**
