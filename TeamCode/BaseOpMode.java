@@ -129,6 +129,12 @@ public abstract class BaseOpMode extends LinearOpMode {
 
     /** Add drive motor positions, etc., to telemetry data. */
     public void addDrivetrainTelemetry() {
+        telemetry.addLine("DRIVETRAIN");
+        telemetry.addData("maxPower: ", maxPower);
+        telemetry.addData("leftFrontPower: ", leftFrontPower);
+        telemetry.addData("leftBackPower: ", leftBackPower);
+        telemetry.addData("rightFrontPower: ", rightFrontPower);
+        telemetry.addData("rightBackPower: ", rightBackPower);
         telemetry.addData("LF", leftFrontMotor.getCurrentPosition());
         telemetry.addData("RF", rightFrontMotor.getCurrentPosition());
         telemetry.addData("LB", leftBackMotor.getCurrentPosition());

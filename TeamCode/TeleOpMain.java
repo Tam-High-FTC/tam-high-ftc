@@ -140,11 +140,6 @@ public class TeleOpMain extends BaseOpMode {
             leftBackPower = leftBackPower / maxPower;
             rightFrontPower = rightFrontPower / maxPower;
             rightBackPower = rightBackPower / maxPower;
-            telemetry.addData("maxPower: ", maxPower);
-            telemetry.addData("leftFrontPower: ", leftFrontPower);
-            telemetry.addData("leftBackPower: ", leftBackPower);
-            telemetry.addData("rightFrontPower: ", rightFrontPower);
-            telemetry.addData("rightBackPower: ", rightBackPower);
 
             // Set the motor power
             leftFrontMotor.setVelocity(speed * leftFrontPower);
