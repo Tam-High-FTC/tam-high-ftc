@@ -158,22 +158,13 @@ public class TeleOpMain extends BaseOpMode {
             // Prevent movement if both or neither are pressed.
             if (motorUpInput != motorDownInput) {
                 if (motorUpInput) {
-                    targetLiftPosition += LIFT_SPEED;
-                } else if (motorDownInput) {
-                    targetLiftPosition -= LIFT_SPEED;
+                    moveLift(LIFT_SPEED);
+                }
+                if (motorDownInput) {
+                    moveLift(-LIFT_SPEED);
                 }
             }
-            // Clamp targetLiftPosition to min/maxPosition
-            targetLiftPosition = (int) Math.min(LIFT_MAX_POSITION,
-                    Math.max(LIFT_MIN_POSITION, targetLiftPosition));
-            liftMotorOne.setTargetPosition(targetLiftPosition);
-            liftMotorTwo.setTargetPosition(targetLiftPosition);
-            liftMotorThree
-                    .setTargetPosition(-(int) Math.floor((double) targetLiftPosition * LIFT_EXTEND_RETRACT_RATIO));
-            telemetry.addData("Lift Position One: ", liftMotorOne.getCurrentPosition());
-            telemetry.addData("Lift Position Two: ", liftMotorTwo.getCurrentPosition());
-            telemetry.addData("Lift Position Three: ", liftMotorThree.getCurrentPosition());
-            telemetry.addData("Lift Target Position: ", targetLiftPosition);
+            addLiftTelemetry();
             // END LIFT
 
             // START CLAW

@@ -85,6 +85,32 @@ public abstract class BaseOpMode extends LinearOpMode {
                 || rightBackMotor.isBusy());
     }
 
+    /** Moves the lift by the given number of encoder ticks. */
+    public void moveLift(int positionDelta) {
+        this.targetLiftPosition += positionDelta;
+        moveLiftToPosition(this.targetLiftPosition);
+    }
+
+    /**
+     * Sets this.targetLiftPosition within bounds,
+     * and moves motors to target that position.
+     */
+    public void moveLiftToPosition(int targetLiftPosition) {
+        this.targetLiftPosition = (int) Math.min(LIFT_MAX_POSITION,
+                Math.max(LIFT_MIN_POSITION, targetLiftPosition));
+        liftMotorOne.setTargetPosition(targetLiftPosition);
+        liftMotorTwo.setTargetPosition(targetLiftPosition);
+        liftMotorThree
+                .setTargetPosition(-(int) Math.floor((double) targetLiftPosition * LIFT_EXTEND_RETRACT_RATIO));
+    }
+
+    public void addLiftTelemetry() {
+        telemetry.addData("Lift Position One: ", liftMotorOne.getCurrentPosition());
+        telemetry.addData("Lift Position Two: ", liftMotorTwo.getCurrentPosition());
+        telemetry.addData("Lift Position Three: ", liftMotorThree.getCurrentPosition());
+        telemetry.addData("Lift Target Position: ", targetLiftPosition);
+    }
+
     @Override
     public void runOpMode() {
         /**
