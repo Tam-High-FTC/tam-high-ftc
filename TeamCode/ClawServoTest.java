@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 // We will need some operators from this library
 import java.lang.Math;
 
-@TeleOp(name = "Test: Claw Servo Test", group = "Linear Opmode")
+@TeleOp(name = "Claw", group = "Testing")
 public class ClawServoTest extends LinearOpMode {
     // Declare the hardware variables
     private Servo servoOne, servoTwo;

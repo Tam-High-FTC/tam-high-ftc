@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Template: Basic Mecanum Drive", group = "Linear Opmode")
+@TeleOp(name = "Main TeleOp", group = "Main")
 public class TeleOpMain extends BaseOpMode {
 
     @Override

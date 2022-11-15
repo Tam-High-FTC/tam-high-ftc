@@ -24,7 +24,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
  * license key as
  * is explained below.
  */
-@Autonomous(name = "AutonomousTensorFlow")
+@Autonomous(name = "Main Autonomous", group = "Main")
 public class AutonomousTensorFlow extends BaseOpMode {
 
     /*

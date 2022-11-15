@@ -4,10 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-// We will need some operators from this library
-import java.lang.Math;
-
-@TeleOp(name = "Test: Lift Motor Test", group = "Linear Opmode")
+@TeleOp(name = "Lift", group = "Testing")
 public class LiftMotorTest extends LinearOpMode {
     // Declare the hardware variables
     private DcMotor motorOne, motorTwo;
