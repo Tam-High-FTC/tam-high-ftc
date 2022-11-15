@@ -172,10 +172,7 @@ public class TeleOpMain extends BaseOpMode {
             moveClaw(clawOpen);
             // END CLAW
 
-            telemetry.addData("LF", leftFrontMotor.getCurrentPosition());
-            telemetry.addData("RF", rightFrontMotor.getCurrentPosition());
-            telemetry.addData("LB", leftBackMotor.getCurrentPosition());
-            telemetry.addData("RB", rightBackMotor.getCurrentPosition());
+            addDrivetrainTelemetry();
             telemetry.update();
         }
     }

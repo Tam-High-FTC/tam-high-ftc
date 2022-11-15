@@ -104,14 +104,6 @@ public abstract class BaseOpMode extends LinearOpMode {
                 .setTargetPosition(-(int) Math.floor((double) targetLiftPosition * LIFT_EXTEND_RETRACT_RATIO));
     }
 
-    /** Add lift motor posititions, etc., to telemetry data. */
-    public void addLiftTelemetry() {
-        telemetry.addData("Lift Position One: ", liftMotorOne.getCurrentPosition());
-        telemetry.addData("Lift Position Two: ", liftMotorTwo.getCurrentPosition());
-        telemetry.addData("Lift Position Three: ", liftMotorThree.getCurrentPosition());
-        telemetry.addData("Lift Target Position: ", targetLiftPosition);
-    }
-
     /** Move claw to a specific position. 0 is closed, 1 is open. */
     public void moveClaw(float position) {
         position = Math.min(0, Math.max(1, position));
@@ -133,6 +125,22 @@ public abstract class BaseOpMode extends LinearOpMode {
     /** Close the claw. */
     public void closeClaw() {
         moveClaw(false);
+    }
+
+    /** Add drive motor positions, etc., to telemetry data. */
+    public void addDrivetrainTelemetry() {
+        telemetry.addData("LF", leftFrontMotor.getCurrentPosition());
+        telemetry.addData("RF", rightFrontMotor.getCurrentPosition());
+        telemetry.addData("LB", leftBackMotor.getCurrentPosition());
+        telemetry.addData("RB", rightBackMotor.getCurrentPosition());
+    }
+
+    /** Add lift motor positions, etc., to telemetry data. */
+    public void addLiftTelemetry() {
+        telemetry.addData("Lift Position One: ", liftMotorOne.getCurrentPosition());
+        telemetry.addData("Lift Position Two: ", liftMotorTwo.getCurrentPosition());
+        telemetry.addData("Lift Position Three: ", liftMotorThree.getCurrentPosition());
+        telemetry.addData("Lift Target Position: ", targetLiftPosition);
     }
 
     @Override
