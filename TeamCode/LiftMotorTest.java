@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 // We will need some operators from this library
 import java.lang.Math;
@@ -20,7 +19,6 @@ public class LiftMotorTest extends LinearOpMode {
         // to 'get' must correspond to the names assigned during the robot configuration
         motorOne = hardwareMap.get(DcMotor.class, "motor_one");
         motorTwo = hardwareMap.get(DcMotor.class, "motor_two");
-        
 
         // Wait for the drive to press the Start button on the Driver Hub
         waitForStart();
@@ -33,15 +31,15 @@ public class LiftMotorTest extends LinearOpMode {
             // magnitude.
             // The direction is the direction to move
             float motorPower = 0;
-            if(motorUp){
+            if (motorUp) {
                 motorPower = 1;
-            } else if (motorDown){
+            } else if (motorDown) {
                 motorPower = -1;
             }
-            
+
             motorOne.setPower(motorPower);
-            motorTwo.setPower(motorPower);            
-            
+            motorTwo.setPower(motorPower);
+
             telemetry.update();
         }
     }
