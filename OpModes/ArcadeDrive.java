@@ -8,22 +8,22 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 @TeleOp(name = "Template: Arcade Drive", group = "Linear Opmode")
 public class ArcadeDrive extends LinearOpMode {
     // Declare the hardware variables
-    private DcMotor leftFront, rightFront;
-    private DcMotor leftBack, rightBack;
+    private DcMotor leftFrontMotor, rightFrontMotor;
+    private DcMotor leftBackMotor, rightBackMotor;
 
     @Override
     public void runOpMode() {
         // Initialize the hardware variables. Note that the strings used here as
         // parameters
         // to 'get' must correspond to the names assigned during the robot configuration
-        leftFront = hardwareMap.get(DcMotor.class, "left_front");
-        rightFront = hardwareMap.get(DcMotor.class, "right_front");
-        leftBack = hardwareMap.get(DcMotor.class, "left_back");
-        rightBack = hardwareMap.get(DcMotor.class, "right_back");
+        leftFrontMotor = hardwareMap.get(DcMotor.class, "left_front");
+        rightFrontMotor = hardwareMap.get(DcMotor.class, "right_front");
+        leftBackMotor = hardwareMap.get(DcMotor.class, "left_back");
+        rightBackMotor = hardwareMap.get(DcMotor.class, "right_back");
 
         // One of the pairs of motors needs to be reversed
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
-        rightBack.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
 
         // Wait for the drive to press the Start button on the Driver Hub
         waitForStart();
@@ -40,10 +40,10 @@ public class ArcadeDrive extends LinearOpMode {
             float right = deltaY - deltaX;
 
             // Set the motor power
-            leftFront.setPower(left);
-            rightFront.setPower(right);
-            leftBack.setPower(left);
-            rightBack.setPower(right);
+            leftFrontMotor.setPower(left);
+            rightFrontMotor.setPower(right);
+            leftBackMotor.setPower(left);
+            rightBackMotor.setPower(right);
         }
     }
 }

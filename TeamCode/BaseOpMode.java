@@ -8,25 +8,53 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+/**
+ * BaseOpMode encapsulates the control logic for our robot,
+ * and exposes a protected interface for children OpModes to use.
+ */
 public abstract class BaseOpMode extends LinearOpMode {
-    protected DcMotorEx leftFront, rightFront;
-    protected DcMotorEx leftBack, rightBack;
+    /** The drivetrain motors. */
+    protected DcMotorEx leftFrontMotor, rightFrontMotor, leftBackMotor, rightBackMotor;
+    /**
+     * The internal Inertial Measurement Unit.
+     * Note that this chip is present on the old Expansion Hubs,
+     * not on our new Control Hubs.
+     * Waiting on SDK update for new chip. (2022-11-15)
+     */
     protected BNO055IMU imu;
-    protected DcMotorEx motorOne, motorTwo, motorThree;
-    protected Servo clawServoRight, clawServoLeft; // right is 1, left is 2
+    /** The lift motors. */
+    protected DcMotorEx liftMotorOne, liftMotorTwo, liftMotorThree;
+    /** The claw servos. */
+    protected Servo clawServoRight, clawServoLeft;
 
-    public static float TICKS_PER_ROTATION = 560f;
+    /** Encoder ticks per rotation for 20:1 REV HD Hex Motors */
+    public static final float DRIVE_TICKS_PER_ROTATION = 560f;
 
+    /** Encoder value at initialization for lift motors. */
+    public static final int LIFT_MIN_POSITION = 0;
+    /** Encoder value at full extension for lift extension motors. */
+    public static final int LIFT_MAX_POSITION = 1550;
+    /**
+     * Ratio of encoder values at full extension for extension/retraction lift
+     * motors
+     */
+    public static final double LIFT_EXTEND_RETRACT_RATIO = 1750 / 1500;
+
+    /** Scales changes to targetRotation. */
     public float rotateSpeed = 1f;
 
+    /** What rotation value should the robot move towards? Degrees, -179 to 179. */
     public float targetRotation = 0f;
+    /** What x-axis position should the robot move towards? */
     public float targetX = 0f;
+    /** What y-axis position should the robot move towards? */
     public float targetY = 0f;
     public float currentDeltaX = 0f;
     public float currentDeltaY = 0f;
     public float currentX = 0f;
     public float currentY = 0f;
 
+    /** Configure the passed motor to use RUN_TO_POSITION mode. */
     public void setMotorRunToPosition(DcMotorEx motor) {
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setTargetPosition(0);
@@ -35,49 +63,57 @@ public abstract class BaseOpMode extends LinearOpMode {
         motor.setPower(1f);
     }
 
+    /** Are any of the drivetrain motors currently busy? */
     public boolean isBusy() {
-        return (leftFront.isBusy()
-                || rightFront.isBusy()
-                || leftBack.isBusy()
-                || rightBack.isBusy());
+        return (leftFrontMotor.isBusy()
+                || rightFrontMotor.isBusy()
+                || leftBackMotor.isBusy()
+                || rightBackMotor.isBusy());
     }
 
     @Override
     public void runOpMode() {
-        // Initialize the hardware variables. Note that the strings used here as
-        // parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        leftFront = hardwareMap.get(DcMotorEx.class, "left_front");
-        rightFront = hardwareMap.get(DcMotorEx.class, "right_front");
-        leftBack = hardwareMap.get(DcMotorEx.class, "left_back");
-        rightBack = hardwareMap.get(DcMotorEx.class, "right_back");
+        /**
+         * Initialize the hardware variables. Note that the strings used here as
+         * parameters to 'get' must correspond to the names assigned during the robot
+         * configuration on the Driver Hub.
+         */
+        leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front");
+        rightFrontMotor = hardwareMap.get(DcMotorEx.class, "right_front");
+        leftBackMotor = hardwareMap.get(DcMotorEx.class, "left_back");
+        rightBackMotor = hardwareMap.get(DcMotorEx.class, "right_back");
         clawServoRight = hardwareMap.get(Servo.class, "servo_one");
         clawServoLeft = hardwareMap.get(Servo.class, "servo_two");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-        motorOne = hardwareMap.get(DcMotorEx.class, "lift_one");
-        motorTwo = hardwareMap.get(DcMotorEx.class, "lift_two");
-        motorThree = hardwareMap.get(DcMotorEx.class, "lift_three");
+        liftMotorOne = hardwareMap.get(DcMotorEx.class, "lift_one");
+        liftMotorTwo = hardwareMap.get(DcMotorEx.class, "lift_two");
+        liftMotorThree = hardwareMap.get(DcMotorEx.class, "lift_three");
 
+        // Configure the IMU
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-
         imu.initialize(parameters);
 
-        // One of the pairs of motors needs to be reversed
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
-        // rightBack.setDirection(DcMotor.Direction.REVERSE);
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.REVERSE);
-        // START SETUP FOR LIFT SYSTEM
-        // Initialize the hardware variables. Note that the strings used here as
-        // parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        motorOne.setDirection(DcMotor.Direction.REVERSE);
-        motorThree.setDirection(DcMotor.Direction.REVERSE);
-        setMotorRunToPosition(motorOne);
-        setMotorRunToPosition(motorTwo);
-        setMotorRunToPosition(motorThree);
+        // SETUP DRIVETRAIN
+        rightFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        // rightBackMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftBackMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        // START LIFT SYSTEM
+        liftMotorOne.setDirection(DcMotor.Direction.REVERSE);
+        liftMotorThree.setDirection(DcMotor.Direction.REVERSE);
+        setMotorRunToPosition(liftMotorOne);
+        setMotorRunToPosition(liftMotorTwo);
+        setMotorRunToPosition(liftMotorThree);
+        int minPosition = 0;
+        int maxPosition = 1550; // 6 turns at 288 ticks per turn
+        int maxPositionPull = 1750;
+        int targetPosition = 0;
+        int liftSpeed = 10;
+        double upDownRatio = (maxPositionPull / maxPosition); // Ratio of maxPositionPull to maxPosition
+        // END SETUP FOR LIFT SYSTEM
     }
 }

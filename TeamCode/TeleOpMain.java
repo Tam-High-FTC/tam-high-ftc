@@ -9,26 +9,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+/**
+ * The main TeleOp OpMode for the 2022-2023 POWER PLAY game.
+ */
 @TeleOp(name = "Main TeleOp", group = "Main")
 public class TeleOpMain extends BaseOpMode {
 
     @Override
     public void runOpMode() {
         super.runOpMode();
-
-        int minPosition = 0;
-        int maxPosition = 1550; // 6 turns at 288 ticks per turn
         int maxPositionPull = 1750;
         int targetPosition = 0;
         int liftSpeed = 10;
-        double upDownRatio = (maxPositionPull / maxPosition); // Ratio of maxPositionPull to maxPosition
         // END SETUP FOR LIFT SYSTEM
 
         // Wait for the drive to press the Start button on the Driver Hub
         waitForStart();
         imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
-        // PIDCoefficients pidOrig =
-        // leftFront.getPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Loop until the robot is stopped
         long lastTime = System.nanoTime() / 1000000;
@@ -78,7 +75,7 @@ public class TeleOpMain extends BaseOpMode {
             // The magnitude is how fast to move
             float magnitude = (float) Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
             float speed = rotationsPerSecond
-                    * BasicMecanumDrive.TICKS_PER_ROTATION;
+                    * BasicMecanumDrive.DRIVE_TICKS_PER_ROTATION;
 
             // Amend rotation to correct for drift
             float currentRotation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX,
@@ -154,10 +151,10 @@ public class TeleOpMain extends BaseOpMode {
             telemetry.addData("rightBackPower: ", rightBackPower);
 
             // Set the motor power
-            leftFront.setVelocity(speed * leftFrontPower);
-            leftBack.setVelocity(speed * leftBackPower);
-            rightFront.setVelocity(speed * rightFrontPower);
-            rightBack.setVelocity(speed * rightBackPower);
+            leftFrontMotor.setVelocity(speed * leftFrontPower);
+            leftBackMotor.setVelocity(speed * leftBackPower);
+            rightFrontMotor.setVelocity(speed * rightFrontPower);
+            rightBackMotor.setVelocity(speed * rightBackPower);
 
             // START LIFT
             boolean motorUp = gamepad1.dpad_up;
@@ -168,14 +165,14 @@ public class TeleOpMain extends BaseOpMode {
                 targetPosition -= liftSpeed;
             }
             // Clamp targetPosition to min/maxPosition
-            targetPosition = (int) Math.min(maxPosition,
-                    Math.max(minPosition, targetPosition));
-            motorOne.setTargetPosition(targetPosition);
-            motorTwo.setTargetPosition(targetPosition);
-            motorThree.setTargetPosition(-(int) Math.floor((double) targetPosition * upDownRatio));
-            telemetry.addData("Lift Position One: ", motorOne.getCurrentPosition());
-            telemetry.addData("Lift Position Two: ", motorTwo.getCurrentPosition());
-            telemetry.addData("Lift Position Three: ", motorThree.getCurrentPosition());
+            targetPosition = (int) Math.min(LIFT_MAX_POSITION,
+                    Math.max(LIFT_MIN_POSITION, targetPosition));
+            liftMotorOne.setTargetPosition(targetPosition);
+            liftMotorTwo.setTargetPosition(targetPosition);
+            liftMotorThree.setTargetPosition(-(int) Math.floor((double) targetPosition * LIFT_EXTEND_RETRACT_RATIO));
+            telemetry.addData("Lift Position One: ", liftMotorOne.getCurrentPosition());
+            telemetry.addData("Lift Position Two: ", liftMotorTwo.getCurrentPosition());
+            telemetry.addData("Lift Position Three: ", liftMotorThree.getCurrentPosition());
             telemetry.addData("Lift Target Position: ", targetPosition);
             // END LIFT
 
@@ -185,10 +182,10 @@ public class TeleOpMain extends BaseOpMode {
             clawServoLeft.setPosition(1 - clawOpen);
             // END CLAW
 
-            telemetry.addData("LF", leftFront.getCurrentPosition());
-            telemetry.addData("RF", rightFront.getCurrentPosition());
-            telemetry.addData("LB", leftBack.getCurrentPosition());
-            telemetry.addData("RB", rightBack.getCurrentPosition());
+            telemetry.addData("LF", leftFrontMotor.getCurrentPosition());
+            telemetry.addData("RF", rightFrontMotor.getCurrentPosition());
+            telemetry.addData("LB", leftBackMotor.getCurrentPosition());
+            telemetry.addData("RB", rightBackMotor.getCurrentPosition());
             telemetry.update();
         }
     }

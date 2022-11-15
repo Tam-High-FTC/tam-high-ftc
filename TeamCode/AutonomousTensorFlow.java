@@ -11,23 +11,14 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 /**
- * This 2022-2023 OpMode illustrates the basics of using the TensorFlow Object
- * Detection API to
- * determine which image is being presented to the robot.
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code
- * folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver
- * Station OpMode list.
- *
- * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia
- * license key as
- * is explained below.
+ * This OpMode does basic image recognition
+ * to identify a signal cone in Power Play,
+ * and positions the robot in the appropriate signal zone.
  */
 @Autonomous(name = "Main Autonomous", group = "Main")
 public class AutonomousTensorFlow extends BaseOpMode {
 
-    /*
+    /**
      * Specify the source for the Tensor Flow Model.
      * If the TensorFlowLite object model is included in the Robot Controller App as
      * an "asset",
@@ -38,16 +29,19 @@ public class AutonomousTensorFlow extends BaseOpMode {
      * Here we assume it's an Asset. Also see method initTfod() below .
      */
     private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/model_20221023_141235.tflite";
-    // private static final String TFOD_MODEL_FILE =
-    // "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
-    // labels below :)
+    /**
+     * Labels for the different symbols.
+     * MUST match labels used when training the model.
+     * SHOULD be unique for a given version of a symbol;
+     * even for small changes, create a new label to avoid confusion.
+     */
     private static final String[] LABELS = {
             "s1",
             "s4",
             "s5"
     };
 
-    /*
+    /**
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string
      * below with which
      * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and
@@ -83,10 +77,10 @@ public class AutonomousTensorFlow extends BaseOpMode {
     public void runOpMode() {
         super.runOpMode();
 
-        setMotorRunToPosition(leftFront);
-        setMotorRunToPosition(rightFront);
-        setMotorRunToPosition(leftBack);
-        setMotorRunToPosition(rightBack);
+        setMotorRunToPosition(leftFrontMotor);
+        setMotorRunToPosition(rightFrontMotor);
+        setMotorRunToPosition(leftBackMotor);
+        setMotorRunToPosition(rightBackMotor);
 
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we
         // create that
@@ -125,10 +119,10 @@ public class AutonomousTensorFlow extends BaseOpMode {
         int selectedSymbol = -1;
 
         if (opModeIsActive()) {
-            leftFront.setTargetPosition(1100);
-            rightFront.setTargetPosition(1100);
-            leftBack.setTargetPosition(1100);
-            rightBack.setTargetPosition(1100);
+            leftFrontMotor.setTargetPosition(1100);
+            rightFrontMotor.setTargetPosition(1100);
+            leftBackMotor.setTargetPosition(1100);
+            rightBackMotor.setTargetPosition(1100);
             while (isBusy()) {
             }
             while (opModeIsActive() && selectedSymbol < 0) {
@@ -180,26 +174,26 @@ public class AutonomousTensorFlow extends BaseOpMode {
                         // case 0:
                         // // super.navigateTo(0,1);
                         // target = true;
-                        // leftFront.setTargetPosition(1100);
-                        // rightFront.setTargetPosition(1100);
-                        // leftBack.setTargetPosition(1100);
-                        // rightBack.setTargetPosition(1100);
+                        // leftFrontMotor.setTargetPosition(1100);
+                        // rightFrontMotor.setTargetPosition(1100);
+                        // leftBackMotor.setTargetPosition(1100);
+                        // rightBackMotor.setTargetPosition(1100);
                         // break;
                         // case 1:
                         // // super.navigateTo(1,1);
                         // movedToTargetLocation = true;
-                        // leftBack.setTargetPosition(100);
+                        // leftBackMotor.setTargetPosition(100);
                         // break;
                         // case 2:
                         // // super.navigateTo(2,1);
                         // movedToTargetLocation = true;
-                        // rightFront.setTargetPosition(100);
+                        // rightFrontMotor.setTargetPosition(100);
                         // break;
                         // default:
-                        // leftFront.setTargetPosition(0);
-                        // rightFront.setTargetPosition(0);
-                        // leftBack.setTargetPosition(0);
-                        // rightBack.setTargetPosition(0);
+                        // leftFrontMotor.setTargetPosition(0);
+                        // rightFrontMotor.setTargetPosition(0);
+                        // leftBackMotor.setTargetPosition(0);
+                        // rightBackMotor.setTargetPosition(0);
                         // break;
                         // }
 
@@ -208,24 +202,24 @@ public class AutonomousTensorFlow extends BaseOpMode {
 
                 }
             }
-            leftFront.setTargetPosition(1100);
-            rightFront.setTargetPosition(1100);
-            leftBack.setTargetPosition(1100);
-            rightBack.setTargetPosition(1100);
+            leftFrontMotor.setTargetPosition(1100);
+            rightFrontMotor.setTargetPosition(1100);
+            leftBackMotor.setTargetPosition(1100);
+            rightBackMotor.setTargetPosition(1100);
             while (isBusy()) {
             }
             switch (selectedSymbol) {
                 case 0:
-                    leftFront.setTargetPosition(0);
-                    rightFront.setTargetPosition(2200);
-                    leftBack.setTargetPosition(2200);
-                    rightBack.setTargetPosition(0);
+                    leftFrontMotor.setTargetPosition(0);
+                    rightFrontMotor.setTargetPosition(2200);
+                    leftBackMotor.setTargetPosition(2200);
+                    rightBackMotor.setTargetPosition(0);
                     break;
                 case 2:
-                    leftFront.setTargetPosition(2200);
-                    rightFront.setTargetPosition(0);
-                    leftBack.setTargetPosition(0);
-                    rightBack.setTargetPosition(2200);
+                    leftFrontMotor.setTargetPosition(2200);
+                    rightFrontMotor.setTargetPosition(0);
+                    leftBackMotor.setTargetPosition(0);
+                    rightBackMotor.setTargetPosition(2200);
                     break;
             }
         }
