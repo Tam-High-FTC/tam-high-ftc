@@ -41,9 +41,23 @@ public abstract class BaseOpMode extends LinearOpMode {
     public static final double LIFT_EXTEND_RETRACT_RATIO = 1750 / 1500;
 
     /** Scales changes to targetRotation. */
-    public float rotateSpeed = 1f;
+    public static final float ROTATION_SPEED = 1f;
 
-    /** What rotation value should the robot move towards? Degrees, -179 to 179. */
+    /** Scales changes to targetLiftPosition. */
+    public static final float LIFT_SPEED = 1f;
+
+    /**
+     * What position should the lift go towards?
+     * Encoder ticks
+     * LIFT_MIN_POSITION to LIFT_MAX_POSITION
+     */
+    public int targetLiftPosition = 0;
+
+    /**
+     * What rotation value should the robot move towards?
+     * Degrees
+     * -179 to 179.
+     */
     public float targetRotation = 0f;
     /** What x-axis position should the robot move towards? */
     public float targetX = 0f;
@@ -108,12 +122,5 @@ public abstract class BaseOpMode extends LinearOpMode {
         setMotorRunToPosition(liftMotorOne);
         setMotorRunToPosition(liftMotorTwo);
         setMotorRunToPosition(liftMotorThree);
-        int minPosition = 0;
-        int maxPosition = 1550; // 6 turns at 288 ticks per turn
-        int maxPositionPull = 1750;
-        int targetPosition = 0;
-        int liftSpeed = 10;
-        double upDownRatio = (maxPositionPull / maxPosition); // Ratio of maxPositionPull to maxPosition
-        // END SETUP FOR LIFT SYSTEM
     }
 }

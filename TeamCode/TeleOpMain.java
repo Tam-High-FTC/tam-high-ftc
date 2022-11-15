@@ -18,10 +18,6 @@ public class TeleOpMain extends BaseOpMode {
     @Override
     public void runOpMode() {
         super.runOpMode();
-        int maxPositionPull = 1750;
-        int targetPosition = 0;
-        int liftSpeed = 10;
-        // END SETUP FOR LIFT SYSTEM
 
         // Wait for the drive to press the Start button on the Driver Hub
         waitForStart();
@@ -60,7 +56,7 @@ public class TeleOpMain extends BaseOpMode {
             // Rotate by moving right stick left-right
 
             float playerRotation = gamepad1.right_stick_x;
-            targetRotation -= playerRotation * rotateSpeed;
+            targetRotation -= playerRotation * ROTATION_SPEED;
 
             // First, we need to split the translation vector into a direction and a
             // magnitude.
@@ -157,23 +153,27 @@ public class TeleOpMain extends BaseOpMode {
             rightBackMotor.setVelocity(speed * rightBackPower);
 
             // START LIFT
-            boolean motorUp = gamepad1.dpad_up;
-            boolean motorDown = gamepad1.dpad_down;
-            if (motorUp) {
-                targetPosition += liftSpeed;
-            } else if (motorDown) {
-                targetPosition -= liftSpeed;
+            boolean motorUpInput = gamepad1.dpad_up;
+            boolean motorDownInput = gamepad1.dpad_down;
+            // Prevent movement if both or neither are pressed.
+            if (motorUpInput != motorDownInput) {
+                if (motorUpInput) {
+                    targetLiftPosition += LIFT_SPEED;
+                } else if (motorDownInput) {
+                    targetLiftPosition -= LIFT_SPEED;
+                }
             }
-            // Clamp targetPosition to min/maxPosition
-            targetPosition = (int) Math.min(LIFT_MAX_POSITION,
-                    Math.max(LIFT_MIN_POSITION, targetPosition));
-            liftMotorOne.setTargetPosition(targetPosition);
-            liftMotorTwo.setTargetPosition(targetPosition);
-            liftMotorThree.setTargetPosition(-(int) Math.floor((double) targetPosition * LIFT_EXTEND_RETRACT_RATIO));
+            // Clamp targetLiftPosition to min/maxPosition
+            targetLiftPosition = (int) Math.min(LIFT_MAX_POSITION,
+                    Math.max(LIFT_MIN_POSITION, targetLiftPosition));
+            liftMotorOne.setTargetPosition(targetLiftPosition);
+            liftMotorTwo.setTargetPosition(targetLiftPosition);
+            liftMotorThree
+                    .setTargetPosition(-(int) Math.floor((double) targetLiftPosition * LIFT_EXTEND_RETRACT_RATIO));
             telemetry.addData("Lift Position One: ", liftMotorOne.getCurrentPosition());
             telemetry.addData("Lift Position Two: ", liftMotorTwo.getCurrentPosition());
             telemetry.addData("Lift Position Three: ", liftMotorThree.getCurrentPosition());
-            telemetry.addData("Lift Target Position: ", targetPosition);
+            telemetry.addData("Lift Target Position: ", targetLiftPosition);
             // END LIFT
 
             // START CLAW
