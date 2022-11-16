@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 // We will need some operators from this library
 import java.lang.Math;
 
-@TeleOp(name = "Test: Claw Servo Test", group = "Linear Opmode")
+@TeleOp(name = "Claw", group = "Testing")
 public class ClawServoTest extends LinearOpMode {
     // Declare the hardware variables
     private Servo servoOne, servoTwo;
@@ -21,7 +21,6 @@ public class ClawServoTest extends LinearOpMode {
         // to 'get' must correspond to the names assigned during the robot configuration
         servoOne = hardwareMap.get(Servo.class, "servo_one");
         servoTwo = hardwareMap.get(Servo.class, "servo_two");
-        
 
         // Wait for the drive to press the Start button on the Driver Hub
         waitForStart();
@@ -29,10 +28,10 @@ public class ClawServoTest extends LinearOpMode {
         // Loop until the robot is stopped
         while (opModeIsActive()) {
             float clawOpen = gamepad1.left_trigger;
-            
+
             servoOne.setPosition(clawOpen);
-            servoTwo.setPosition(1-clawOpen);
-        
+            servoTwo.setPosition(1 - clawOpen);
+
             telemetry.update();
         }
     }
