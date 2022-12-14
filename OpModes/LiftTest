@@ -1,0 +1,83 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+// We will need some operators from this library
+import java.lang.Math;
+
+@TeleOp(name = "Test: Lift Motor Test", group = "Linear Opmode")
+public class LiftMotorTest extends LinearOpMode {
+    // Declare the hardware variables
+    private DcMotorEx motorOne, motorTwo, motorThree;
+
+    @Override
+    public void runOpMode() {
+        // Initialize the hardware variables. Note that the strings used here as
+        // parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        motorOne = hardwareMap.get(DcMotorEx.class, "lift_one");
+        motorTwo = hardwareMap.get(DcMotorEx.class, "lift_two");
+        motorThree = hardwareMap.get(DcMotorEx.class, "lift_three");
+        
+        motorOne.setDirection(DcMotor.Direction.REVERSE);
+        
+        motorOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorThree.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
+        motorOne.setVelocity(720f, AngleUnit.DEGREES);
+        motorTwo.setVelocity(720f, AngleUnit.DEGREES);
+        motorThree.setVelocity(720f, AngleUnit.DEGREES);
+        
+        motorOne.setPower(1f);
+        motorTwo.setPower(1f);
+        motorThree.setPower(1f);
+        
+        motorOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorTwo.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorThree.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        
+        int minPosition = 0;
+        int maxPosition = 1550; // 6 turns at 288 ticks per turn
+        int maxPositionPull = 1750;
+        int targetPosition = 0;
+        int speed = 10;
+        double upDownRatio = (maxPositionPull / maxPosition); // Ratio of maxPositionPull to maxPosition
+        
+        // Wait for the drive to press the Start button on the Driver Hub
+        waitForStart();
+
+        // Loop until the robot is stopped
+        while (opModeIsActive()) {
+            boolean motorUp = gamepad1.dpad_up;
+            boolean motorDown = gamepad1.dpad_down;
+            // First, we need to split the translation vector into a direction and a
+            // magnitude.
+            // The direction is the direction to move
+            if(motorUp){
+                targetPosition += speed;
+            } else if (motorDown){
+                targetPosition -= speed;
+            }
+            // Clamp targetPosition to min/maxPosition
+            targetPosition = (int)
+                Math.min(maxPosition,
+                Math.max(minPosition, targetPosition)
+                );
+            
+            motorOne.setTargetPosition(targetPosition);
+            motorTwo.setTargetPosition(targetPosition);
+            motorThree.setTargetPosition(-(int)Math.floor((double)targetPosition * upDownRatio));
+            telemetry.addData("Current Position One: ", motorOne.getCurrentPosition());
+            telemetry.addData("Current Position Two: ", motorTwo.getCurrentPosition());
+            telemetry.addData("Current Position Three: ", motorThree.getCurrentPosition());
+            telemetry.addData("Target Position: ", targetPosition);
+            telemetry.update();
+        }
+    }
+}
